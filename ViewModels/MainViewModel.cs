@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Xml.Serialization;
+using TescoSwTask.Helpers;
 using TescoSwTask.Models;
 
 namespace TescoSoftwareTask.ViewModels
@@ -19,13 +20,13 @@ namespace TescoSoftwareTask.ViewModels
 
         public ObservableCollection<Car> Cars { get; } = new ObservableCollection<Car>();
 
-        public ObservableCollection<SummaryInfo> Summary { get; } = new ObservableCollection<SummaryInfo>();
+        public ObservableCollection<SaleInfo> Summary { get; } = new ObservableCollection<SaleInfo>();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void LoadCars(string filePath) 
@@ -50,23 +51,32 @@ namespace TescoSoftwareTask.ViewModels
             {
                 MessageBox.Show($"Error durring loading a file: {ex.Message}");
             }
-            UpdateData(data);
+            if (data != null || data.Count != 0)
+            {
+                UpdateData(data);
+            }
         }
 
-        private ObservableCollection<SummaryInfo> CreateSummaryInfo()
+        private ObservableCollection<SaleInfo> CreateSaleInfo()
         {
             List<string> modelNames = Cars.Select(c => c.Name).Distinct().ToList();
-            List<SummaryInfo> result = new List<SummaryInfo>();
+            List<SaleInfo> result = new List<SaleInfo>();
+            var carsSaleAtWeekend = Cars.Where(c => Helper.IsSaleAtWeekend(c.DateOfSale)).ToList();
 
             foreach (var modelName in modelNames)
             {
-                double totalPrice = Cars.Where(c => c.Name == modelName).Sum(c => c.Price);
-                double totalPriceWithDph = Cars.Where(c => c.Name == modelName).Sum(c => c.PriceWithDPH);
-                SummaryInfo info = new SummaryInfo() { ModelName = modelName, PriceWithDph = totalPriceWithDph, PriceWithoutDph = totalPrice };
+                double totalPrice = carsSaleAtWeekend.Where(c => c.Name == modelName).Sum(c => c.Price);
+                if (totalPrice == 0)
+                {
+                    continue;
+                }
+                double totalPriceWithDph = carsSaleAtWeekend.Where(c => c.Name == modelName).Sum(c => c.PriceWithDPH);
+                SaleInfo info = new SaleInfo() { ModelName = modelName, PriceWithDph = totalPriceWithDph, PriceWithoutDph = totalPrice };
+                
                 result.Add(info);
             }
 
-            return new ObservableCollection<SummaryInfo>(result);
+            return new ObservableCollection<SaleInfo>(result);
         }
 
         private void UpdateData(ObservableCollection<Car> data)
@@ -77,7 +87,7 @@ namespace TescoSoftwareTask.ViewModels
                 Cars.Add(car);
             }
 
-            ObservableCollection<SummaryInfo> infos = CreateSummaryInfo();
+            ObservableCollection<SaleInfo> infos = CreateSaleInfo();
             Summary.Clear();
             foreach (var info in infos)
             {

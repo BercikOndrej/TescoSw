@@ -35,7 +35,7 @@
         </DataGrid>
         <StackPanel Visibility="{Binding HasData, Converter={StaticResource BoolToVisible}}" Grid.Row="2" Margin="8" Orientation="Vertical" Width="300" HorizontalAlignment="Left">
 
-            <TextBlock Text="Souhrné informace" FontSize="20" FontWeight="Bold" Margin="0 0 0 16" />
+            <TextBlock Text="Vozy prodané pouze o víkendu" FontSize="20" FontWeight="Bold" Margin="0 0 0 16" />
             <!-- Table -->
 
             <Grid Background="LightGray">

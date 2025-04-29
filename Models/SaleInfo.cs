@@ -8,7 +8,7 @@ using TescoSwTask.Helpers;
 
 namespace TescoSwTask.Models
 {
-    public class SummaryInfo
+    public class SaleInfo
     {
         public string ModelName { get; set; }
         public double PriceWithoutDph { get; set; }

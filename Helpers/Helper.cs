@@ -15,7 +15,8 @@ namespace TescoSwTask.Helpers
             customCulture.NumberFormat.NumberDecimalSeparator = ",";
             customCulture.NumberFormat.NumberGroupSeparator = " ";
             return number.ToString("#,0.00", customCulture) + " ,- Kč";
-        } 
-       
+        }
+
+        public static bool IsSaleAtWeekend(DateTime date) => date.DayOfWeek == DayOfWeek.Sunday || date.DayOfWeek == DayOfWeek.Saturday;
     }
 }
